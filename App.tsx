@@ -99,8 +99,10 @@ export default function App() {
 
     try {
       const context = audioContextRef.current;
-      const source = context.createBufferSource();
-      source.buffer = audioBuffer;
+      const source1 = context.createBufferSource();
+      const source2 = context.createBufferSource();
+      source1.buffer = audioBuffer;
+      source2.buffer = audioBuffer;
 
       // Create wet path: gain -> filter
       const wetGain = context.createGain();
@@ -116,15 +118,16 @@ export default function App() {
       dryGain.gain.value = 1 - test2Mix;
 
       // Connect wet path: source -> wetGain -> filter -> destination
-      source.connect(wetGain);
+      source1.connect(wetGain);
       wetGain.connect(filter);
       filter.connect(context.destination);
 
       // Connect dry path: source -> dryGain -> destination
-      source.connect(dryGain);
+      source2.connect(dryGain);
       dryGain.connect(context.destination);
 
-      source.start();
+      source1.start(context.currentTime + 0.01);
+      source2.start(context.currentTime + 0.01);
     } catch (err) {
       console.error('Error in playTest2:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -159,11 +162,11 @@ export default function App() {
         source.connect(wetGain);
         wetGain.connect(filter);
         filter.connect(context.destination);
+      } else {
+        // Connect dry path: source -> dryGain -> destination
+        source.connect(dryGain);
+        dryGain.connect(context.destination);
       }
-
-      // Connect dry path: source -> dryGain -> destination
-      source.connect(dryGain);
-      dryGain.connect(context.destination);
 
       source.start();
     } catch (err) {
