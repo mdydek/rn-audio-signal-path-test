@@ -126,6 +126,7 @@ export default function App() {
       source2.connect(dryGain);
       dryGain.connect(context.destination);
 
+      // slight delay to make sure both start together
       source1.start(context.currentTime + 0.01);
       source2.start(context.currentTime + 0.01);
     } catch (err) {
